@@ -1,0 +1,27 @@
+name: Build and release npm package
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Setup node to publish to GitHub Packages
+        uses: actions/setup-node@v1
+        with:
+          node-version: "16.x"
+          registry-url: "https://npm.pkg.github.com"
+          scope: "@avinet"
+
+      # Main branch only
+      - name: Publish production package to GitHub Packages
+        run: |
+          npm publish --access restricted
+        if: contains(github.ref, 'main')
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
